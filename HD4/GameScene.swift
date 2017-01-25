@@ -137,11 +137,8 @@ class GameScene: SKScene {
         
         var indexOfInterest = currentIndex
         var temp:SKSpriteNode = SKSpriteNode()
+        
         // find out where the next element should go
-        var IOItemp = indexOfInterest
-        var CItemp = currentIndex
-        
-        
         while(indexOfInterest > 0 && Int((array[indexOfInterest].name! as NSString) as String)! < Int((array[indexOfInterest - 1].name! as NSString) as String)!) {
             temp = array[indexOfInterest]
             array[indexOfInterest] = array[indexOfInterest - 1]
@@ -150,7 +147,7 @@ class GameScene: SKScene {
         }
         
         
-        return String(indexOfInterest)
+        return String(indexOfInterest + 1)
     }
     
     func updateDisplay() {
@@ -158,7 +155,7 @@ class GameScene: SKScene {
         //self.removeChildren(in: SKScene)
         
         let screenWidthDivide = screenWidth/4
-        let screenHeightDivide = screenHeight/2
+        _ = screenHeight/2
         var screenStart = (0 - screenWidth) + screenWidthDivide
 
         self.removeAllChildren()
@@ -198,6 +195,8 @@ class GameScene: SKScene {
             
                 if let touch = touches.first {
                     let location = touch.location(in: self)
+                    
+                    // check every button in array if it has been touched
                     for object in array {
                         
                         // if a user touched a button
@@ -205,98 +204,45 @@ class GameScene: SKScene {
                         
                             // if the button is the node to be sorted
                             if String(object.name!) == toBeSorted {
-                                print("You Clicked the right one!")
+                                // selected the correct button to sort
+                                flashCorrect()
                                 searching = false;
-                                
-                                if let wnd = self.view{
-                                    
-                                    var v = UIView(frame: wnd.bounds)
-                                    v.backgroundColor = UIColor.green
-                                    v.alpha = 0.5
-                                    
-                                    wnd.addSubview(v)
-                                    UIView.animate(withDuration: 1, animations: {
-                                        v.alpha = 0.0
-                                        }, completion: {(finished:Bool) in
-                                            print("inside")
-                                            v.removeFromSuperview()
-                                    })
-                                }
-                                
+                                return;
                                 
                             } else {
-                                if let wnd = self.view{
-                                    
-                                    var v = UIView(frame: wnd.bounds)
-                                    v.backgroundColor = UIColor.red
-                                    v.alpha = 0.5
-                                    
-                                    wnd.addSubview(v)
-                                    UIView.animate(withDuration: 1, animations: {
-                                        v.alpha = 0.0
-                                        }, completion: {(finished:Bool) in
-                                            print("inside")
-                                            v.removeFromSuperview()
-                                    })
-                                }
+                                flashIncorrect()
+                                return;
                             }
                         }
                     }
                 }
-            }
-            
-            if(!searching) {
+            } else {
                         
                 // user chose the correct node, now have them choose where to sort it
-                var correctPlacement = getCorrectPlacement()
+                let correctPlacement = getCorrectPlacement()
                 
                 if let touch2 = touches.first {
                 let location2 = touch2.location(in: self)
-                                
+                    
+                    // check every button in array if it has been touched
                     for object2 in array {
                                     
                         // if the user has touched a sprite
                         if object2.contains(location2) {
                             // if the sprite is the node to be swaped out
                             if(String(object2.name!) == ((array[Int(correctPlacement)!].name! as NSString) as String)) {
-                                print("Yayyyy!!! You sorted it")
                                 updateDisplay()
                                 currentIndex += 1
                                 searching = true
 
-                                // FLASH FLASH
-                                if let wnd = self.view{
-                                    
-                                    var v = UIView(frame: wnd.bounds)
-                                    v.backgroundColor = UIColor.green
-                                    v.alpha = 0.5
-                                    
-                                    wnd.addSubview(v)
-                                    UIView.animate(withDuration: 1, animations: {
-                                        v.alpha = 0.0
-                                        }, completion: {(finished:Bool) in
-                                            print("inside")
-                                            v.removeFromSuperview()
-                                    })
-                                }
+                                // Selected the correct place to put the node
+                                flashCorrect()
+                                return;
                                 
                             } else {
-                                
-                                // FLASH FLASH
-                                if let wnd = self.view{
-                                    
-                                    var v = UIView(frame: wnd.bounds)
-                                    v.backgroundColor = UIColor.red
-                                    v.alpha = 0.5
-                                    
-                                    wnd.addSubview(v)
-                                    UIView.animate(withDuration: 1, animations: {
-                                        v.alpha = 0.0
-                                        }, completion: {(finished:Bool) in
-                                            print("inside")
-                                            v.removeFromSuperview()
-                                    })
-                                }
+                                // Selected the incorrect place to put the node
+                                flashIncorrect()
+                                return;
                             }
                         }
                     }
@@ -305,6 +251,40 @@ class GameScene: SKScene {
         }
 
     }
+    
+    func flashIncorrect() {
+        if let wnd = self.view{
+            
+            let v = UIView(frame: wnd.bounds)
+            v.backgroundColor = UIColor.red
+            v.alpha = 0.5
+            
+            wnd.addSubview(v)
+            UIView.animate(withDuration: 1, animations: {
+                v.alpha = 0.0
+            }, completion: {(finished:Bool) in
+                print("Incorrect!")
+                v.removeFromSuperview()
+            })
+        }
+    } // flashes screen red
+    
+    func flashCorrect() {
+        if let wnd = self.view{
+            
+            let v = UIView(frame: wnd.bounds)
+            v.backgroundColor = UIColor.green
+            v.alpha = 0.5
+            
+            wnd.addSubview(v)
+            UIView.animate(withDuration: 1, animations: {
+                v.alpha = 0.0
+            }, completion: {(finished:Bool) in
+                print("Correct!")
+                v.removeFromSuperview()
+            })
+        }
+    } // flashes screen green
     
  /*   override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         for t in touches { self.touchMoved(toPoint: t.location(in: self)) }
